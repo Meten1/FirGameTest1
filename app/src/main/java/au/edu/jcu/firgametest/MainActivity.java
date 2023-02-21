@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isRedrawing;
     private Runnable redraw;
     private List<Bullet> bullets;
+    private List<Enemy> enemies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +30,14 @@ public class MainActivity extends AppCompatActivity {
         screen_width = dm.widthPixels;
 
         bullets = new ArrayList<>();
-        addBullet(5, 300,50);
-        addBullet(30, 50,100);
+        enemies = new ArrayList<>();
+        bullets.add(new Bullet(screen_width,5, 300,50));
+        bullets.add(new Bullet(screen_width,30, 50,100));
+        enemies.add(new Enemy(screen_width,30,50));
         Handler mainHandler = new Handler();
         outerspaceView = findViewById(R.id.outerspaceView);
-        outerspaceView.setBullet(bullets);
+        outerspaceView.setStart(bullets,"bullet");
+        outerspaceView.setStart(enemies,"enemy");
 
         redraw = () -> {
             if (isRedrawing) {
@@ -44,26 +48,28 @@ public class MainActivity extends AppCompatActivity {
         };
         mainHandler.post(redraw);
 
-
-
-
     }
 
-    private void addBullet(int speed,int x, int y){
-        bullets.add(new Bullet(screen_width,speed,x,y));
-    }
+
 
     private void allMove() {
-        for (Bullet bullet : bullets) {
-            bullet.move();
-            PointF position = bullet.getPosition();
-            if (position.x + 50 >= screen_width ){
-                bullets.remove(bullet);
+        for (Enemy enemy : enemies) {
+            enemy.move();
+            PointF position = enemy.getPosition();
+            if (position.x + enemy.getBUBBLE_SIZE()/2 <= 0 ){
+                bullets.remove(enemy);
             }
         }
     }
 
+    private boolean checkPosition(PointF position1,int bubble1, PointF position2, int bubble2){
+        if ((((position1.y + bubble1/2 >= position2.y - bubble2/2 || position1.y - bubble1/2 <= position2.y + bubble2/2))&&((position1.x + bubble1/2 >= position2.x - bubble2/2 || position1.x - bubble1/2 <= position2.x + bubble2/2)))){
+            return true;
+        }
+        return false;
+    }
+    }
 
 
 
-}
+    

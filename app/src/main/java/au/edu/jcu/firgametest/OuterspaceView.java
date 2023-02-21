@@ -16,6 +16,7 @@ import java.util.Random;
 public class OuterspaceView extends View {
     private PointF[] starField;
     private List<Bullet> bullets;
+    private List<Enemy> enemies;
 
     public OuterspaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,10 +45,18 @@ public class OuterspaceView extends View {
         for (Bullet bullet : bullets) {
             bullet.draw(canvas);
         }
+
+        for (Enemy enemy : enemies) {
+            enemy.draw(canvas);
+        }
     }
 
-    public void setBullet(List<Bullet> bullets) {
-        this.bullets = bullets;
+    public <T> void setStart(T things,String type) {
+        if (type.equals("bullet")){
+            bullets = (List<Bullet>) things;
+        } else if (type.equals("enemy")){
+            enemies = (List<Enemy>) things;
+        }
     }
 }
 
