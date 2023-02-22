@@ -14,14 +14,17 @@ public class Bullet {
 
     private final int speed;
     private int BUBBLE_SIZE = 100;
+
+    private int harm;
     Paint paint;
 
-    Bullet(int boundingWidth,int speed, int x, int y) {
+    Bullet(int boundingWidth,int speed, int x, int y, int harm) {
         this.boundingWidth = boundingWidth;
         this.speed = speed;
         position = new PointF();
         position.x = x;
         position.y = y;
+        this.harm = harm;
         paint = new Paint();
         paint.setColor(Color.BLACK);
     }
@@ -42,4 +45,6 @@ public class Bullet {
     }
 
     int getBUBBLE_SIZE() { return BUBBLE_SIZE; }
+
+    int getHarm() { return harm; }
 }

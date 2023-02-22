@@ -10,6 +10,8 @@ import android.util.DisplayMetrics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class MainActivity extends AppCompatActivity {
     private int screen_width;
@@ -31,13 +33,14 @@ public class MainActivity extends AppCompatActivity {
 
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
-        bullets.add(new Bullet(screen_width,5, 300,50));
-        bullets.add(new Bullet(screen_width,30, 50,100));
-        enemies.add(new Enemy(screen_width,30,50));
+        bullets.add(new Bullet(screen_width,5, 300,50,50));
+        bullets.add(new Bullet(screen_width,30, 50,100,30));
+        enemies.add(new Enemy(screen_width,30,50,100));
         Handler mainHandler = new Handler();
         outerspaceView = findViewById(R.id.outerspaceView);
         outerspaceView.setStart(bullets,"bullet");
         outerspaceView.setStart(enemies,"enemy");
+
 
         redraw = () -> {
             if (isRedrawing) {
@@ -53,23 +56,72 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void allMove() {
-        for (Enemy enemy : enemies) {
-            enemy.move();
-            PointF position = enemy.getPosition();
-            if (position.x + enemy.getBUBBLE_SIZE()/2 <= 0 ){
-                bullets.remove(enemy);
+        Thread BulletMove = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (bullets.size() <= 0){
+                    return;
+                }
+                CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
+                for (Bullet bullet:bullets){
+                    bullet.move();
+                }
+                try {
+                    cyclicBarrier.await();
+                } catch (InterruptedException | BrokenBarrierException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+        Thread EnemyMove = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
+                for (Enemy enemy:enemies){
+                    enemy.move();
+                }
+                try {
+                    cyclicBarrier.await();
+                } catch (InterruptedException | BrokenBarrierException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        BulletMove.start();
+        EnemyMove.start();
+        checkPosition();
+    }
+
+    private void checkPosition(){
+        for (Bullet bullet:bullets){
+            float bulletX = bullet.getPosition().x;
+            float bulletY = bullet.getPosition().y;
+            float bulletBubble = bullet.getBUBBLE_SIZE();
+            if (bulletX + bulletBubble >= screen_width){
+                bullets.remove(bullet);
+                continue;
+            }
+            for (Enemy enemy:enemies){
+                float enemyX = enemy.getPosition().x;
+                float enemyY = enemy.getPosition().y;
+                float enemyBubble = enemy.getBUBBLE_SIZE();
+                if (((bulletY + bulletBubble >= enemyY - enemyBubble)
+                        || (bulletY - bulletBubble <= enemyY + enemyBubble))
+                        && (bulletX + bulletBubble >= enemyX - enemyBubble)){
+                    enemy.hit(bullet.getHarm());
+                    bullets.remove(bullet);
+                    if (enemy.getBlood()<=0){
+                        enemies.remove(enemy);
+                    }
+                    break;
+                }
             }
         }
+
     }
 
-    private boolean checkPosition(PointF position1,int bubble1, PointF position2, int bubble2){
-        if ((((position1.y + bubble1/2 >= position2.y - bubble2/2 || position1.y - bubble1/2 <= position2.y + bubble2/2))&&((position1.x + bubble1/2 >= position2.x - bubble2/2 || position1.x - bubble1/2 <= position2.x + bubble2/2)))){
-            return true;
-        }
-        return false;
-    }
-    }
+}
 
 
 
-    

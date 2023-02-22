@@ -11,13 +11,15 @@ public class Enemy {
     private final int speed;
     private int BUBBLE_SIZE = 100;
     Paint paint;
+    private int blood;
 
-    Enemy(int boundingWidth, int speed, int y) {
+    Enemy(int boundingWidth, int speed, int y,int blood) {
         this.boundingWidth = boundingWidth;
         this.speed = speed;
         position = new PointF();
         position.x = boundingWidth;
         position.y = y;
+        this.blood = blood;
         paint = new Paint();
         paint.setColor(Color.YELLOW);
     }
@@ -32,10 +34,16 @@ public class Enemy {
         position.x -=  speed;
     }
 
+    void hit(int harm){
+        blood -= harm;
+    }
+
     PointF getPosition(){
         return position;
     }
 
     int getBUBBLE_SIZE() { return BUBBLE_SIZE; }
+
+    int getBlood() { return blood; }
 }
 
