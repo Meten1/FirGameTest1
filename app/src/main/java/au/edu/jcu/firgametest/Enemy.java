@@ -31,7 +31,7 @@ public class Enemy {
     }
 
     void move() {
-        position.x -=  speed;
+        position.x -=  speed * 0.1;
     }
 
     void hit(int harm){

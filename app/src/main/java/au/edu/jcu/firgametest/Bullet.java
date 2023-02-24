@@ -37,7 +37,7 @@ public class Bullet {
     }
 
     void move() {
-        position.x +=  speed;
+        position.x += speed * 0.1;
     }
 
     PointF getPosition(){

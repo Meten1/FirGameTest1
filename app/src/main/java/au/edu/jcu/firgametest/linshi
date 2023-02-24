@@ -1,0 +1,4 @@
+for (Bullet bullet:bullets){
+//                    bulletRemove(bullet);
+                    bullets.remove(bullet);
+                    System.out.println("执行删除----------");
