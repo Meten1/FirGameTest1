@@ -3,10 +3,12 @@ package au.edu.jcu.firgametest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 
 import java.sql.Time;
@@ -19,11 +21,13 @@ import java.util.concurrent.CyclicBarrier;
 
 public class MainActivity extends AppCompatActivity {
     private int screen_width;
+    private int screen_height;
     private OuterspaceView outerspaceView;
     private boolean isRedrawing;
     private Runnable redraw;
     private List<Bullet> bullets;
     private List<Enemy> enemies;
+    private List<UpgradeBall> upgradeBalls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,17 +37,23 @@ public class MainActivity extends AppCompatActivity {
 
         Resources resources = this.getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
+
         screen_width = dm.widthPixels;
+        screen_height = dm.heightPixels - 200;
 
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
-        bullets.add(new Bullet(screen_width,25, 0,50,70));
+        upgradeBalls = new ArrayList<>();
+        bullets.add(new Bullet(screen_width,25, 0,50,50));
         bullets.add(new Bullet(screen_width,30, 0,100,30));
-        enemies.add(new Enemy(screen_width,30,50,100));
+        enemies.add(new Enemy(screen_width,30,200,100));
+        upgradeBalls.add(new UpgradeBall(screen_width,screen_height,100,100,-1,1));
         Handler mainHandler = new Handler();
+
         outerspaceView = findViewById(R.id.outerspaceView);
         outerspaceView.setStart(bullets,"bullet");
         outerspaceView.setStart(enemies,"enemy");
+        outerspaceView.setStart(upgradeBalls,"upgradeBall");
 
 
         redraw = () -> {
@@ -103,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
             enemytMove(enemy);
         }
 
+        for (UpgradeBall upgradeBall : upgradeBalls){
+            upgradeBalltMove(upgradeBall);
+        }
+
     }
 
     public void test(View view){
@@ -150,13 +164,13 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException | BrokenBarrierException e){
                     e.printStackTrace();
                 }
-                System.out.println("---------------线程末尾");
 
             }
         });
         thread.start();
     }
 
+    //创建子线程线程使敌机移动，该线程只检测敌机是否碰撞边缘以及检测血量，敌机消失机制在这里
     private void enemytMove(Enemy enemy){
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -166,10 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        System.out.println("---------------线程运行");
                         enemy.move();
                         float enemyX= enemy.getPosition().x;
-                        float enemyY= enemy.getPosition().y;
                         int enemyBubble = enemy.getBUBBLE_SIZE();
                         if (enemy.getBlood() <= 0 || enemyX - enemyBubble <= 0){
                             enemies.remove(enemy);
@@ -182,8 +194,32 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException | BrokenBarrierException e){
                     e.printStackTrace();
                 }
-                System.out.println("---------------线程末尾");
 
+
+            }
+        });
+        thread.start();
+    }
+
+    private void upgradeBalltMove(UpgradeBall upgradeBall){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        upgradeBall.move();
+                        upgradeBall.checkCollide();
+                        }
+
+                },0L,10L);
+                try {
+                    cyclicBarrier.await();
+                } catch (InterruptedException | BrokenBarrierException e){
+                    e.printStackTrace();
+                }
             }
         });
         thread.start();

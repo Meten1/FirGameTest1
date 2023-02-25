@@ -17,6 +17,7 @@ public class OuterspaceView extends View {
     private PointF[] starField;
     private List<Bullet> bullets;
     private List<Enemy> enemies;
+    private List<UpgradeBall> upgradeBalls;
 
     public OuterspaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,6 +50,10 @@ public class OuterspaceView extends View {
         for (Enemy enemy : enemies) {
             enemy.draw(canvas);
         }
+
+        for (UpgradeBall upgradeBall : upgradeBalls){
+            upgradeBall.draw(canvas);
+        }
     }
 
     public <T> void setStart(T things,String type) {
@@ -56,6 +61,8 @@ public class OuterspaceView extends View {
             bullets = (List<Bullet>) things;
         } else if (type.equals("enemy")){
             enemies = (List<Enemy>) things;
+        } else if (type.equals("upgradeBall")){
+            upgradeBalls = (List<UpgradeBall>) things;
         }
     }
 }
