@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
+import java.util.Random;
+
 public class UpgradeBall {
     private PointF position;
     private int dirX;
@@ -15,6 +17,7 @@ public class UpgradeBall {
     private final int speed;
     private int BUBBLE_SIZE = 50;
     Paint paint;
+    private Random rd;
 
     UpgradeBall(int boundingWidth, int boundingHeight, int speed, int y,int dirX, int dirY) {
         this.boundingWidth = boundingWidth;
@@ -27,6 +30,7 @@ public class UpgradeBall {
         this.dirY = dirY;
         paint = new Paint();
         paint.setColor(Color.BLUE);
+        rd = new Random();
 
 
     }
@@ -38,6 +42,14 @@ public class UpgradeBall {
     }
 
     void move(){
+
+        int rdNum = rd.nextInt(50);
+        if (rdNum == 0){
+            position.x += (speed * dirX) * 0.1;
+        } else if (rdNum == 1){
+            position.y += (speed * dirY) * 0.1;
+        }
+
         position.x += (speed * dirX) * 0.1;
         position.y += (speed * dirY) * 0.1;
     }
@@ -45,11 +57,9 @@ public class UpgradeBall {
     void checkCollide(){
         float x = position.x;
         float y = position.y;
-//        if (x + BUBBLE_SIZE >= boundingWidth || x - BUBBLE_SIZE <= 0){
-//            dirX *= -1;
-//        } else if (y + BUBBLE_SIZE >= boundingHeight || y - BUBBLE_SIZE <= 0){
-//            dirY *= -1;
-//        }
+
+
+
         if ((x - BUBBLE_SIZE <= 0 && dirX < 0) || (x + BUBBLE_SIZE >= boundingWidth && dirX > 0)) {
             dirX *= -1;
         }

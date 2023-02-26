@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.sql.Time;
@@ -28,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     private List<Bullet> bullets;
     private List<Enemy> enemies;
     private List<UpgradeBall> upgradeBalls;
+    private List<Fighterplane> fighterPlanes;
+    int lastX = 0;
+    int lastY = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +48,19 @@ public class MainActivity extends AppCompatActivity {
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
         upgradeBalls = new ArrayList<>();
+        fighterPlanes = new ArrayList<>();
         bullets.add(new Bullet(screen_width,25, 0,50,50));
         bullets.add(new Bullet(screen_width,30, 0,100,30));
         enemies.add(new Enemy(screen_width,30,200,100));
         upgradeBalls.add(new UpgradeBall(screen_width,screen_height,100,100,-1,1));
+        fighterPlanes.add(new Fighterplane(screen_width,600,200,20));
         Handler mainHandler = new Handler();
 
         outerspaceView = findViewById(R.id.outerspaceView);
         outerspaceView.setStart(bullets,"bullet");
         outerspaceView.setStart(enemies,"enemy");
         outerspaceView.setStart(upgradeBalls,"upgradeBall");
+        outerspaceView.setStart(fighterPlanes,"fighterPlanes");
 
 
         redraw = () -> {
@@ -201,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
 
+    //创建子线程使升级球移动，并触发升级球的检测碰撞反弹机制
     private void upgradeBalltMove(UpgradeBall upgradeBall){
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -223,6 +231,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         thread.start();
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY() - 200;
+//        for (Fighterplane fighterPlane:fighterPlanes){
+//            PointF position = fighterPlane.getPosition();
+//            int bubble = fighterPlane.getBUBBLE_SIZE();
+//            if ((x > position.x + bubble || x < position.x - bubble)
+//                    || (y > position.y + bubble || y < position.y - bubble)){
+//                System.out.println("-----------------------");
+//                return false;
+//            }
+//        }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                lastX = x;
+                lastY = y;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                // 计算偏移量
+                int offsetX = x - lastX;
+                int offsetY = y - lastY;
+                lastX = x;
+                lastY = y;
+                for (Fighterplane fighterPlane:fighterPlanes){
+                    fighterPlane.move(offsetX,offsetY);
+
+                }
+                break;
+        }
+        return true;
     }
 
 

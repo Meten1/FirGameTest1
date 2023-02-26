@@ -18,6 +18,7 @@ public class OuterspaceView extends View {
     private List<Bullet> bullets;
     private List<Enemy> enemies;
     private List<UpgradeBall> upgradeBalls;
+    private List<Fighterplane> fighterPlanes;
 
     public OuterspaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -54,6 +55,10 @@ public class OuterspaceView extends View {
         for (UpgradeBall upgradeBall : upgradeBalls){
             upgradeBall.draw(canvas);
         }
+
+        for (Fighterplane fighterplane:fighterPlanes){
+            fighterplane.draw(canvas);
+        }
     }
 
     public <T> void setStart(T things,String type) {
@@ -63,6 +68,8 @@ public class OuterspaceView extends View {
             enemies = (List<Enemy>) things;
         } else if (type.equals("upgradeBall")){
             upgradeBalls = (List<UpgradeBall>) things;
+        } else if (type.equals("fighterPlanes")) {
+            fighterPlanes = (List<Fighterplane>) things;
         }
     }
 }
