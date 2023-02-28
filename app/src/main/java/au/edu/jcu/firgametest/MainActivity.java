@@ -3,24 +3,24 @@ package au.edu.jcu.firgametest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.res.Resources;
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 public class MainActivity extends AppCompatActivity {
+
+
+
     private int screen_width;
     private int screen_height;
     private OuterspaceView outerspaceView;
@@ -29,9 +29,15 @@ public class MainActivity extends AppCompatActivity {
     private List<Bullet> bullets;
     private List<Enemy> enemies;
     private List<UpgradeBall> upgradeBalls;
-    private List<Fighterplane> fighterPlanes;
+    private List<FighterPlane> fighterPlanes;
     int lastX = 0;
     int lastY = 0;
+
+
+
+    private int speed;
+
+    private Random rd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +51,16 @@ public class MainActivity extends AppCompatActivity {
         screen_width = dm.widthPixels;
         screen_height = dm.heightPixels - 200;
 
+        speed = 100;
+        rd = new Random();
+
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
         upgradeBalls = new ArrayList<>();
         fighterPlanes = new ArrayList<>();
-        bullets.add(new Bullet(screen_width,25, 0,50,50));
-        bullets.add(new Bullet(screen_width,30, 0,100,30));
-        enemies.add(new Enemy(screen_width,30,200,100));
-        upgradeBalls.add(new UpgradeBall(screen_width,screen_height,100,100,-1,1));
-        fighterPlanes.add(new Fighterplane(screen_width,600,200,20));
+
+
+        fighterPlanes.add(new FighterPlane(screen_width,600,200,35));
         Handler mainHandler = new Handler();
 
         outerspaceView = findViewById(R.id.outerspaceView);
@@ -74,48 +81,11 @@ public class MainActivity extends AppCompatActivity {
         allMove();
     }
 
-
-
     private void allMove() {
-//        Thread BulletMove = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (bullets.size() <= 0){
-//                    return;
-//                }
-//                CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
-//                for (Bullet bullet:bullets){
-//                    bullet.move();
-//                }
-//                try {
-//                    cyclicBarrier.await();
-//                } catch (InterruptedException | BrokenBarrierException e){
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        Thread EnemyMove = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
-//                for (Enemy enemy:enemies){
-//                    enemy.move();
-//                }
-//                try {
-//                    cyclicBarrier.await();
-//                } catch (InterruptedException | BrokenBarrierException e){
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//
-//        BulletMove.start();
-//        EnemyMove.start();
-//        checkPosition();
-
         for (Bullet bullet:bullets){
             bulletMove(bullet);
         }
+
         for (Enemy enemy:enemies){
             enemytMove(enemy);
         }
@@ -124,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
             upgradeBalltMove(upgradeBall);
         }
 
+        fire();
+        generateRun();
     }
 
     public void test(View view){
@@ -156,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                             float enemyY = enemy.getPosition().y;
                             int enemyBubble = enemy.getBUBBLE_SIZE();
                             if (((bulletY + bulletBubble >= enemyY - enemyBubble)
-                                    || (bulletY - bulletBubble <= enemyY + enemyBubble))
+                                    && (bulletY - bulletBubble <= enemyY + enemyBubble))
                                     && (bulletX + bulletBubble >= enemyX - enemyBubble)){
                                 enemy.hit(bullet.getHarm());
                                 bullets.remove(bullet);
@@ -171,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException | BrokenBarrierException e){
                     e.printStackTrace();
                 }
-
             }
         });
         thread.start();
@@ -189,10 +160,22 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         enemy.move();
                         float enemyX= enemy.getPosition().x;
+                        float enemyY= enemy.getPosition().y;
                         int enemyBubble = enemy.getBUBBLE_SIZE();
                         if (enemy.getBlood() <= 0 || enemyX - enemyBubble <= 0){
                             enemies.remove(enemy);
                             timer.cancel();
+                        }
+                        for (FighterPlane fighterPlane:fighterPlanes){
+                            float x = fighterPlane.getPosition().x;
+                            float y = fighterPlane.getPosition().y;
+                            int bubble = fighterPlane.getBUBBLE_SIZE();
+                            if ((enemyX + enemyBubble > x - bubble && enemyX - enemyBubble < x + bubble)
+                                    && (enemyY + enemyBubble > y - bubble && enemyY - enemyBubble < y + bubble)){
+                                fighterPlanes.remove(fighterPlane);
+                                enemies.remove(enemy);
+                                timer.cancel();
+                            }
                         }
                     }
                 },0L,10L);
@@ -208,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
 
-    //创建子线程使升级球移动，并触发升级球的检测碰撞反弹机制
+    //创建子线程使升级球移动，并触发升级球的检测碰撞反弹机制，升级球与战舰的碰撞机制也在这里
     private void upgradeBalltMove(UpgradeBall upgradeBall){
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -220,9 +203,23 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         upgradeBall.move();
                         upgradeBall.checkCollide();
+                        for (FighterPlane fighterPlane:fighterPlanes){
+                            float planeX = fighterPlane.getPosition().x;
+                            float planeY = fighterPlane.getPosition().y;
+                            int planeBubble = fighterPlane.getBUBBLE_SIZE();
+                            float x = upgradeBall.getPosition().x;
+                            float y = upgradeBall.getPosition().y;
+                            int bubble = upgradeBall.getBUBBLE_SIZE();
+                            if ((planeX + planeBubble > x - bubble && planeX - planeBubble < x + bubble)
+                                    && (planeY + planeBubble > y - bubble && planeY - planeBubble < y + bubble)){
+                                upgradeBalls.remove(upgradeBall);
+                                fighterPlane.update();
+                                timer.cancel();
+                            }
                         }
-
+                    }
                 },0L,10L);
+
                 try {
                     cyclicBarrier.await();
                 } catch (InterruptedException | BrokenBarrierException e){
@@ -233,11 +230,46 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
 
+    private void generateRun(){
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
+                generateEnemy();
+                int num = rd.nextInt(10);
+                if (num >= 3){
+                    generateUpdateBall();
+                }
+                try {
+                    cyclicBarrier.await();
+                } catch (InterruptedException | BrokenBarrierException e){
+                    e.printStackTrace();
+                }
+            }
+        },0L,3000L);
+    }
+
+    private void generateEnemy() {
+        int y = rd.nextInt(screen_height);
+        Enemy enemy = new Enemy(screen_width, (int) (speed*0.4),y,100);
+        enemytMove(enemy);
+        enemies.add(enemy);
+    }
+
+    private void generateUpdateBall(){
+        int num = rd.nextInt(3);
+        int y = rd.nextInt(screen_height);
+        UpgradeBall upgradeBall = new UpgradeBall(screen_width,screen_height,100,100);
+        upgradeBalltMove(upgradeBall);
+        upgradeBalls.add(upgradeBall);
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
         int y = (int) event.getY() - 200;
+        //限制触摸区域，Y轴暂时失效，待改良
 //        for (Fighterplane fighterPlane:fighterPlanes){
 //            PointF position = fighterPlane.getPosition();
 //            int bubble = fighterPlane.getBUBBLE_SIZE();
@@ -258,15 +290,13 @@ public class MainActivity extends AppCompatActivity {
                 int offsetY = y - lastY;
                 lastX = x;
                 lastY = y;
-                for (Fighterplane fighterPlane:fighterPlanes){
+                for (FighterPlane fighterPlane:fighterPlanes){
                     fighterPlane.move(offsetX,offsetY);
-
                 }
                 break;
         }
         return true;
     }
-
 
     //暂时无用，保存以供备用
     private void checkPosition(){
@@ -287,8 +317,34 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
     }
+
+    private void fire(){
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
+                for (FighterPlane fighterPlane:fighterPlanes){
+                    float x = fighterPlane.getPosition().x;
+                    float y = fighterPlane.getPosition().y;
+                    int harm = fighterPlane.getHarm();
+                    Bullet bullet = new Bullet(speed,x,y,harm);
+                    bulletMove(bullet);
+                    bullets.add(bullet);
+                }
+                try {
+                    cyclicBarrier.await();
+                } catch (InterruptedException | BrokenBarrierException e){
+                    e.printStackTrace();
+                }
+            }
+        },0L,700L);
+    }
+
+
+
+
 
 
 

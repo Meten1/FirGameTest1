@@ -19,15 +19,15 @@ public class UpgradeBall {
     Paint paint;
     private Random rd;
 
-    UpgradeBall(int boundingWidth, int boundingHeight, int speed, int y,int dirX, int dirY) {
+    UpgradeBall(int boundingWidth, int boundingHeight, int speed, int y) {
         this.boundingWidth = boundingWidth;
         this.boundingHeight = boundingHeight;
         this.speed = speed;
         position = new PointF();
         position.x = boundingWidth;
         position.y = y;
-        this.dirX = dirX;
-        this.dirY = dirY;
+        this.dirX = -1;
+        this.dirY = 1;
         paint = new Paint();
         paint.setColor(Color.BLUE);
         rd = new Random();
@@ -57,9 +57,6 @@ public class UpgradeBall {
     void checkCollide(){
         float x = position.x;
         float y = position.y;
-
-
-
         if ((x - BUBBLE_SIZE <= 0 && dirX < 0) || (x + BUBBLE_SIZE >= boundingWidth && dirX > 0)) {
             dirX *= -1;
         }
@@ -67,5 +64,11 @@ public class UpgradeBall {
             dirY *= -1;
         }
     }
+
+    PointF getPosition(){
+        return position;
+    }
+
+    int getBUBBLE_SIZE() { return BUBBLE_SIZE; }
 
 }

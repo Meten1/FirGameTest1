@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
-public class Fighterplane {
+public class FighterPlane {
     private PointF position;
     private final int boundingWidth;
     private int BUBBLE_SIZE = 100;
@@ -13,7 +13,7 @@ public class Fighterplane {
     private int harm;
     Paint paint;
 
-    Fighterplane(int boundingWidth,int x, int y, int harm) {
+    FighterPlane(int boundingWidth, int x, int y, int harm) {
         this.boundingWidth = boundingWidth;
         position = new PointF();
         position.x = x;
@@ -39,6 +39,14 @@ public class Fighterplane {
     }
 
     int getBUBBLE_SIZE() { return BUBBLE_SIZE; }
+
+    void update(){
+        System.out.println("-----------------------升级");
+    }
+
+    int getHarm(){
+        return harm;
+    }
 
 
 

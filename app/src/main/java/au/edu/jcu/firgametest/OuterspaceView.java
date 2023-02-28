@@ -1,24 +1,20 @@
 package au.edu.jcu.firgametest;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.List;
-import java.util.Random;
 
 public class OuterspaceView extends View {
     private PointF[] starField;
     private List<Bullet> bullets;
     private List<Enemy> enemies;
     private List<UpgradeBall> upgradeBalls;
-    private List<Fighterplane> fighterPlanes;
+    private List<FighterPlane> fighterPlanes;
 
     public OuterspaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -56,7 +52,7 @@ public class OuterspaceView extends View {
             upgradeBall.draw(canvas);
         }
 
-        for (Fighterplane fighterplane:fighterPlanes){
+        for (FighterPlane fighterplane:fighterPlanes){
             fighterplane.draw(canvas);
         }
     }
@@ -69,7 +65,7 @@ public class OuterspaceView extends View {
         } else if (type.equals("upgradeBall")){
             upgradeBalls = (List<UpgradeBall>) things;
         } else if (type.equals("fighterPlanes")) {
-            fighterPlanes = (List<Fighterplane>) things;
+            fighterPlanes = (List<FighterPlane>) things;
         }
     }
 }

@@ -10,16 +10,14 @@ import android.graphics.PorterDuffColorFilter;
 
 public class Bullet {
     private PointF position;
-    private final int boundingWidth;
 
     private final int speed;
-    private int BUBBLE_SIZE = 100;
+    private int BUBBLE_SIZE = 30;
 
     private int harm;
     Paint paint;
 
-    Bullet(int boundingWidth,int speed, int x, int y, int harm) {
-        this.boundingWidth = boundingWidth;
+    Bullet(int speed, float x, float y, int harm) {
         this.speed = speed;
         position = new PointF();
         position.x = x;
