@@ -11,6 +11,7 @@ public class FighterPlane {
     private int BUBBLE_SIZE = 100;
 
     private int harm;
+    private int bulletsNum;
     Paint paint;
 
     FighterPlane(int boundingWidth, int x, int y, int harm) {
@@ -21,6 +22,7 @@ public class FighterPlane {
         this.harm = harm;
         paint = new Paint();
         paint.setColor(Color.BLACK);
+        bulletsNum = 1;
     }
 
     void draw(Canvas canvas) {
@@ -40,8 +42,14 @@ public class FighterPlane {
 
     int getBUBBLE_SIZE() { return BUBBLE_SIZE; }
 
+    public int getBulletsNum() {
+        return bulletsNum;
+    }
+
     void update(){
-        System.out.println("-----------------------升级");
+        if (bulletsNum < 3){
+            bulletsNum += 1;
+        }
     }
 
     int getHarm(){

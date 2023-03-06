@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             upgradeBalltMove(upgradeBall);
         }
 
-        fire();
+        allFire();
         generateRun();
     }
 
@@ -319,19 +319,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void fire(){
+    private void allFire(){
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 CyclicBarrier cyclicBarrier = new CyclicBarrier(1);
                 for (FighterPlane fighterPlane:fighterPlanes){
-                    float x = fighterPlane.getPosition().x;
-                    float y = fighterPlane.getPosition().y;
-                    int harm = fighterPlane.getHarm();
-                    Bullet bullet = new Bullet(speed,x,y,harm);
-                    bulletMove(bullet);
-                    bullets.add(bullet);
+                    fire(fighterPlane);
                 }
                 try {
                     cyclicBarrier.await();
@@ -339,7 +334,29 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        },0L,700L);
+        },0L,1200L);
+    }
+
+    private void fire(FighterPlane fighterPlane){
+        Timer timer = new Timer();
+        int bulletsNum = fighterPlane.getBulletsNum();
+        final int[] count = {0};
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (count[0] < bulletsNum) {
+                    float x = fighterPlane.getPosition().x;
+                    float y = fighterPlane.getPosition().y;
+                    int harm = fighterPlane.getHarm();
+                    Bullet bullet = new Bullet(speed, x, y, harm);
+                    bulletMove(bullet);
+                    bullets.add(bullet);
+                    count[0] += 1;
+                } else {
+                    timer.cancel();
+                }
+            }
+        },0L,200L);
     }
 
 
