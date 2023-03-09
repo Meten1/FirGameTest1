@@ -13,6 +13,7 @@ public class FighterPlane {
     private int harm;
     private int bulletsNum;
     Paint paint;
+    private double harmNum = 1.0;
 
     FighterPlane(int boundingWidth, int BUBBLE_SIZE, float x, float y, int harm) {
         this.boundingWidth = boundingWidth;
@@ -47,9 +48,11 @@ public class FighterPlane {
         return bulletsNum;
     }
 
-    void update(){
-        if (bulletsNum < 3){
+    void update(String type){
+        if (type.equals("BulletsNum") && bulletsNum < 3){
             bulletsNum += 1;
+        } else if (type.equals("Harm")){
+            harm *= 1.1;
         }
     }
 

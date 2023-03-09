@@ -7,20 +7,20 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class OuterspaceView extends View {
     private PointF[] starField;
-    private List<Bullet> bullets;
-    private List<Enemy> enemies;
-    private List<UpgradeBall> upgradeBalls;
-    private List<FighterPlane> fighterPlanes;
+    private CopyOnWriteArrayList<Bullet> bullets;
+    private CopyOnWriteArrayList<Enemy> enemies;
+    private CopyOnWriteArrayList<UpgradeBall> upgradeBalls;
+    private CopyOnWriteArrayList<FighterPlane> fighterPlanes;
 
     public OuterspaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setBackgroundColor(Color.WHITE);
-
-
     }
 
     @Override
@@ -38,7 +38,7 @@ public class OuterspaceView extends View {
     }
 
     private void drawAliens(Canvas canvas) {
-        assert bullets != null;
+//        assert bullets != null;
 
         for (Bullet bullet : bullets) {
             bullet.draw(canvas);
@@ -55,17 +55,18 @@ public class OuterspaceView extends View {
         for (FighterPlane fighterplane:fighterPlanes){
             fighterplane.draw(canvas);
         }
+
     }
 
     public <T> void setStart(T things,String type) {
         if (type.equals("bullet")){
-            bullets = (List<Bullet>) things;
+            bullets = (CopyOnWriteArrayList<Bullet>) things;
         } else if (type.equals("enemy")){
-            enemies = (List<Enemy>) things;
+            enemies = (CopyOnWriteArrayList<Enemy>) things;
         } else if (type.equals("upgradeBall")){
-            upgradeBalls = (List<UpgradeBall>) things;
+            upgradeBalls = (CopyOnWriteArrayList<UpgradeBall>) things;
         } else if (type.equals("fighterPlanes")) {
-            fighterPlanes = (List<FighterPlane>) things;
+            fighterPlanes = (CopyOnWriteArrayList<FighterPlane>) things;
         }
     }
 }

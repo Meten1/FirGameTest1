@@ -18,6 +18,7 @@ public class UpgradeBall {
     private int BUBBLE_SIZE = 50;
     Paint paint;
     private Random rd;
+    private String type;
 
     UpgradeBall(int boundingWidth, int boundingHeight, int speed, int y) {
         this.boundingWidth = boundingWidth;
@@ -31,6 +32,14 @@ public class UpgradeBall {
         paint = new Paint();
         paint.setColor(Color.BLUE);
         rd = new Random();
+        int num = rd.nextInt(3);
+        if (num == 0){
+            type = "BulletsNum";
+        } else if (num == 1){
+            type = "Harm";
+        } else if (num == 2){
+            type = "Harm";
+        }
 
 
     }
@@ -71,4 +80,7 @@ public class UpgradeBall {
 
     int getBUBBLE_SIZE() { return BUBBLE_SIZE; }
 
+    public String getType() {
+        return type;
+    }
 }

@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,10 +27,10 @@ public class MainActivity extends AppCompatActivity {
     private OuterspaceView outerspaceView;
     private boolean isRedrawing;
     private Runnable redraw;
-    private List<Bullet> bullets;
-    private List<Enemy> enemies;
-    private List<UpgradeBall> upgradeBalls;
-    private List<FighterPlane> fighterPlanes;
+    private CopyOnWriteArrayList<Bullet> bullets;
+    private CopyOnWriteArrayList<Enemy> enemies;
+    private CopyOnWriteArrayList<UpgradeBall> upgradeBalls;
+    private CopyOnWriteArrayList<FighterPlane> fighterPlanes;
     int lastX = 0;
     int lastY = 0;
 
@@ -38,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private int speed;
 
     private Random rd;
+
+    private int EnemyNum = 0; //该阶段敌军数量，用于推动游戏难度升级
+
+    private int EnemyGenNum = 1; //每次生成的敌军的数量上限
+    private int diffcultyNum = 1; //难度系数，随敌军生成量提高
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
         speed = 100;
         rd = new Random();
 
-        bullets = new ArrayList<>();
-        enemies = new ArrayList<>();
-        upgradeBalls = new ArrayList<>();
-        fighterPlanes = new ArrayList<>();
+        bullets = new CopyOnWriteArrayList<>();
+        enemies = new CopyOnWriteArrayList<>();
+        upgradeBalls = new CopyOnWriteArrayList<>();
+        fighterPlanes = new CopyOnWriteArrayList<>();
 
 
         fighterPlanes.add(new FighterPlane(screen_width,80,600,200,35));
@@ -133,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                                 enemy.hit(bullet.getHarm());
                                 bullets.remove(bullet);
                                 timer.cancel();
-                                return;
+                                break;
                             }
                         }
                     }
@@ -212,9 +218,9 @@ public class MainActivity extends AppCompatActivity {
                             int bubble = upgradeBall.getBUBBLE_SIZE();
                             if ((planeX + planeBubble > x - bubble && planeX - planeBubble < x + bubble)
                                     && (planeY + planeBubble > y - bubble && planeY - planeBubble < y + bubble)){
+                                String updateType = upgradeBall.getType();
+                                fighterPlane.update(updateType);
                                 upgradeBalls.remove(upgradeBall);
-                                addNewPlane();
-//                                    fighterPlane.update();
                                 timer.cancel();
                                 break;
                             }
@@ -253,10 +259,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void generateEnemy() {
-        int y = rd.nextInt(screen_height);
-        Enemy enemy = new Enemy(screen_width, (int) (speed*0.4),y,100);
-        enemytMove(enemy);
-        enemies.add(enemy);
+        if (EnemyNum >= 5){/////////////////////////////////////////////////////////////////////////////////////
+        diffcultyNum += 1;
+        EnemyNum = 0;
+        }
+        int num = rd.nextInt((int) (diffcultyNum))+1;
+        Timer timer = new Timer();
+        final int[] count = {0};
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (count[0] < num){
+                    int y = rd.nextInt(screen_height);
+                    Enemy enemy = new Enemy(screen_width, (int) (30*(1+(diffcultyNum / 10))),y,100);
+                    enemytMove(enemy);
+                    enemies.add(enemy);
+                    count[0] += 1;
+                    EnemyNum +=1;
+                } else {
+                    timer.cancel();
+                }
+
+            }
+        },0L,50L);
     }
 
     private void generateUpdateBall(){
