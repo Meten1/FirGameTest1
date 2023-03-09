@@ -219,7 +219,11 @@ public class MainActivity extends AppCompatActivity {
                             if ((planeX + planeBubble > x - bubble && planeX - planeBubble < x + bubble)
                                     && (planeY + planeBubble > y - bubble && planeY - planeBubble < y + bubble)){
                                 String updateType = upgradeBall.getType();
-                                fighterPlane.update(updateType);
+                                if (updateType.equals("AddNew")){
+                                    addNewPlane();
+                                } else {
+                                    fighterPlane.update(updateType);
+                                }
                                 upgradeBalls.remove(upgradeBall);
                                 timer.cancel();
                                 break;

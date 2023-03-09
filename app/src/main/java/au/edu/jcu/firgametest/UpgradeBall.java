@@ -37,8 +37,8 @@ public class UpgradeBall {
             type = "BulletsNum";
         } else if (num == 1){
             type = "Harm";
-        } else if (num == 2){
-            type = "Harm";
+        } else {
+            type = "AddNew";
         }
 
 
