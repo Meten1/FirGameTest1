@@ -8,14 +8,15 @@ import android.graphics.PointF;
 public class FighterPlane {
     private PointF position;
     private final int boundingWidth;
-    private int BUBBLE_SIZE = 100;
+    private int BUBBLE_SIZE;
 
     private int harm;
     private int bulletsNum;
     Paint paint;
 
-    FighterPlane(int boundingWidth, int x, int y, int harm) {
+    FighterPlane(int boundingWidth, int BUBBLE_SIZE, float x, float y, int harm) {
         this.boundingWidth = boundingWidth;
+        this.BUBBLE_SIZE = BUBBLE_SIZE;
         position = new PointF();
         position.x = x;
         position.y = y;

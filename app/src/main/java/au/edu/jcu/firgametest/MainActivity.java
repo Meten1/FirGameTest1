@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         fighterPlanes = new ArrayList<>();
 
 
-        fighterPlanes.add(new FighterPlane(screen_width,600,200,35));
+        fighterPlanes.add(new FighterPlane(screen_width,80,600,200,35));
         Handler mainHandler = new Handler();
 
         outerspaceView = findViewById(R.id.outerspaceView);
@@ -213,8 +213,10 @@ public class MainActivity extends AppCompatActivity {
                             if ((planeX + planeBubble > x - bubble && planeX - planeBubble < x + bubble)
                                     && (planeY + planeBubble > y - bubble && planeY - planeBubble < y + bubble)){
                                 upgradeBalls.remove(upgradeBall);
-                                fighterPlane.update();
+                                addNewPlane();
+//                                    fighterPlane.update();
                                 timer.cancel();
+                                break;
                             }
                         }
                     }
@@ -319,6 +321,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //全部开火，调用后遍历全部战机，并为其调用开火方法
     private void allFire(){
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -337,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
         },0L,1200L);
     }
 
+    //开火，调用后以0.2秒间隔根据战机子弹数目发射1-3枚子弹
     private void fire(FighterPlane fighterPlane){
         Timer timer = new Timer();
         int bulletsNum = fighterPlane.getBulletsNum();
@@ -359,7 +363,16 @@ public class MainActivity extends AppCompatActivity {
         },0L,200L);
     }
 
-
+    //添加新的战机，大小为50，伤害为25，添加至战机后方
+    private void addNewPlane(){
+        if (fighterPlanes.size()<5){
+            FighterPlane oldPlane = fighterPlanes.get(fighterPlanes.size() -1);
+            float x = oldPlane.getPosition().x ;
+            float y = oldPlane.getPosition().y + oldPlane.getBUBBLE_SIZE() + 50 + 10;
+            FighterPlane newPlane = new FighterPlane(screen_width,50,x,y,25);
+            fighterPlanes.add(newPlane);
+        }
+    }
 
 
 
@@ -368,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 }
+
 
 
 
