@@ -20,29 +20,27 @@ import java.util.concurrent.CyclicBarrier;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
     private int screen_width;
     private int screen_height;
     private OuterspaceView outerspaceView;
     private boolean isRedrawing;
     private Runnable redraw;
+
+
     private CopyOnWriteArrayList<Bullet> bullets;
     private CopyOnWriteArrayList<Enemy> enemies;
     private CopyOnWriteArrayList<UpgradeBall> upgradeBalls;
     private CopyOnWriteArrayList<FighterPlane> fighterPlanes;
+
+
     int lastX = 0;
     int lastY = 0;
 
 
-
     private int speed;
-
+    FighterPlane mainFighter;
     private Random rd;
-
     private int EnemyNum = 0; //该阶段敌军数量，用于推动游戏难度升级
-
-    private int EnemyGenNum = 1; //每次生成的敌军的数量上限
     private int diffcultyNum = 1; //难度系数，随敌军生成量提高
 
     @Override
@@ -65,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
         upgradeBalls = new CopyOnWriteArrayList<>();
         fighterPlanes = new CopyOnWriteArrayList<>();
 
-
-        fighterPlanes.add(new FighterPlane(screen_width,80,600,200,35));
+        mainFighter = new FighterPlane(80,600,200,35);
+        fighterPlanes.add(mainFighter);
         Handler mainHandler = new Handler();
 
         outerspaceView = findViewById(R.id.outerspaceView);
@@ -75,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         outerspaceView.setStart(upgradeBalls,"upgradeBall");
         outerspaceView.setStart(fighterPlanes,"fighterPlanes");
 
-
         redraw = () -> {
             if (isRedrawing) {
                 outerspaceView.invalidate();
@@ -83,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         mainHandler.post(redraw);
-
         allMove();
     }
 
@@ -104,10 +100,10 @@ public class MainActivity extends AppCompatActivity {
         generateRun();
     }
 
+
     public void test(View view){
         bullets.remove(0);
         System.out.println("执行删除----------");
-
     }
 
     //创建子线程线程使子弹移动，该线程只检测子弹是否碰撞敌机和和边缘，敌机扣血将在这里
@@ -178,9 +174,10 @@ public class MainActivity extends AppCompatActivity {
                             int bubble = fighterPlane.getBUBBLE_SIZE();
                             if ((enemyX + enemyBubble > x - bubble && enemyX - enemyBubble < x + bubble)
                                     && (enemyY + enemyBubble > y - bubble && enemyY - enemyBubble < y + bubble)){
-                                fighterPlanes.remove(fighterPlane);
+                                removePlane(fighterPlane);
                                 enemies.remove(enemy);
                                 timer.cancel();
+                                break;
                             }
                         }
                     }
@@ -242,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
 
+
     private void generateRun(){
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -262,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
         },0L,3000L);
     }
 
+
     private void generateEnemy() {
         if (EnemyNum >= 5){/////////////////////////////////////////////////////////////////////////////////////
         diffcultyNum += 1;
@@ -276,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (count[0] < num){
                     int y = rd.nextInt(screen_height);
-                    Enemy enemy = new Enemy(screen_width, (int) (30*(1+(diffcultyNum / 10))),y,100);
+                    Enemy enemy = new Enemy(50,screen_width, (int) (30*(1+(diffcultyNum / 10))),y,100);
                     enemytMove(enemy);
                     enemies.add(enemy);
                     count[0] += 1;
@@ -289,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
         },0L,50L);
     }
 
+
     private void generateUpdateBall(){
         int num = rd.nextInt(3);
         int y = rd.nextInt(screen_height);
@@ -297,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
         upgradeBalls.add(upgradeBall);
     }
 
+    //触摸方法，每次触摸都会调用
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
@@ -399,15 +400,34 @@ public class MainActivity extends AppCompatActivity {
             FighterPlane oldPlane = fighterPlanes.get(fighterPlanes.size() -1);
             float x = oldPlane.getPosition().x ;
             float y = oldPlane.getPosition().y + oldPlane.getBUBBLE_SIZE() + 50 + 10;
-            FighterPlane newPlane = new FighterPlane(screen_width,50,x,y,25);
+            FighterPlane newPlane = new FighterPlane(50,x,y,1);
             fighterPlanes.add(newPlane);
         }
     }
 
+    private void removePlane(FighterPlane fighterPlane){
+        if (fighterPlane == mainFighter){
+            gameOver();
+        } else {
+            fighterPlanes.remove(fighterPlane);
+            replacePlanes();
+        }
+    }
 
+    private void gameOver(){
+        System.out.println("Game Over");
+        System.exit(0);
+    }
 
-
-
+    private void replacePlanes(){
+        for (int i = 1; i < fighterPlanes.size(); i++) {
+            FighterPlane oldPlane = fighterPlanes.get(i-1);
+            FighterPlane newPlane = fighterPlanes.get(i);
+            float x = oldPlane.getPosition().x;
+            float y = oldPlane.getPosition().y + oldPlane.getBUBBLE_SIZE() + 50 + 10;
+            newPlane.replace(x,y);
+        }
+    }
 
 
 }

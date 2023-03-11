@@ -7,7 +7,6 @@ import android.graphics.PointF;
 
 public class FighterPlane {
     private PointF position;
-    private final int boundingWidth;
     private int BUBBLE_SIZE;
 
     private int harm;
@@ -15,8 +14,7 @@ public class FighterPlane {
     Paint paint;
     private double harmNum = 1.0;
 
-    FighterPlane(int boundingWidth, int BUBBLE_SIZE, float x, float y, int harm) {
-        this.boundingWidth = boundingWidth;
+    FighterPlane(int BUBBLE_SIZE, float x, float y, int harm) {
         this.BUBBLE_SIZE = BUBBLE_SIZE;
         position = new PointF();
         position.x = x;
@@ -58,6 +56,11 @@ public class FighterPlane {
 
     int getHarm(){
         return harm;
+    }
+
+    void replace(float x, float y){
+        position.x = x;
+        position.y = y;
     }
 
 

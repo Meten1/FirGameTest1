@@ -9,14 +9,15 @@ public class Enemy {
     private PointF position;
     private final int boundingWidth;
     private final int speed;
-    private int BUBBLE_SIZE = 100;
+    private int BUBBLE_SIZE;
     Paint paint;
     private int blood;
 
-    Enemy(int boundingWidth, int speed, int y,int blood) {
+    Enemy(int boundingWidth,int bubble, int speed, int y,int blood) {
         this.boundingWidth = boundingWidth;
         this.speed = speed;
         position = new PointF();
+        BUBBLE_SIZE = bubble;
         position.x = boundingWidth;
         position.y = y;
         this.blood = blood;
