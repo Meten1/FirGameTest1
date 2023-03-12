@@ -1,4 +1,21 @@
-for (Bullet bullet:bullets){
-//                    bulletRemove(bullet);
-                    bullets.remove(bullet);
-                    System.out.println("执行删除----------");
+        // 创建数据库对象
+        dbHelper = new MyDatabaseHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // 插入数据
+        String insertDataSql = "INSERT INTO mytable (name, age) VALUES (?, ?)";
+        db.execSQL(insertDataSql, new Object[]{"张三", 20});
+        db.execSQL(insertDataSql, new Object[]{"李四", 22});
+
+        // 查询数据
+        String queryDataSql = "SELECT * FROM mytable";
+        Cursor cursor = db.rawQuery(queryDataSql, null);
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex("id"));
+            String name = cursor.getString(cursor.getColumnIndex("name"));
+            int age = cursor.getInt(cursor.getColumnIndex("age"));
+            // do something with the data...
+        }
+
+        // 关闭数据库
+        db.close();
