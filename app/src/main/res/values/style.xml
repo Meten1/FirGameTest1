@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="start_button">
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingBottom">37dp</item>
+        <item name="android:paddingTop">37dp</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:background">@drawable/start_button</item>
+    </style>
+
+</resources>
