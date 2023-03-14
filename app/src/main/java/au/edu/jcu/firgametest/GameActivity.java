@@ -3,6 +3,8 @@ package au.edu.jcu.firgametest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +27,8 @@ public class GameActivity extends AppCompatActivity {
     private boolean isRedrawing;
     private Runnable redraw;
 
+    private int wallBlood;
+
 
     private CopyOnWriteArrayList<Bullet> bullets;
     private CopyOnWriteArrayList<Enemy> enemies;
@@ -37,8 +41,10 @@ public class GameActivity extends AppCompatActivity {
 
 
     private int speed;
-    FighterPlane mainFighter;
+    FighterPlane mainFighter; //主战机，用于进行比较
     private Random rd;
+
+    int score;
     private int EnemyNum = 0; //该阶段敌军数量，用于推动游戏难度升级
     private int diffcultyNum = 1; //难度系数，随敌军生成量提高
 
@@ -56,6 +62,8 @@ public class GameActivity extends AppCompatActivity {
         screen_height = dm.heightPixels - 200;
 
         speed = 100;
+        score = 0;
+        wallBlood = 10000;
         rd = new Random();
 
         bullets = new CopyOnWriteArrayList<>();
@@ -165,9 +173,14 @@ public class GameActivity extends AppCompatActivity {
                         float enemyX= enemy.getPosition().x;
                         float enemyY= enemy.getPosition().y;
                         int enemyBubble = enemy.getBUBBLE_SIZE();
-                        if (enemy.getBlood() <= 0 || enemyX - enemyBubble <= 0){
+                        if (enemy.getBlood() <= 0){
                             enemies.remove(enemy);
+                            score += (100 * (1+(diffcultyNum/10)));
+                            System.out.println("------------------------");
+                            System.out.println(score);
                             timer.cancel();
+                        } else if ( enemyX - enemyBubble <= 0){
+                            wallBlood -= 100 * ((1+diffcultyNum) / 10);
                         }
                         for (FighterPlane fighterPlane:fighterPlanes){
                             float x = fighterPlane.getPosition().x;
@@ -417,7 +430,12 @@ public class GameActivity extends AppCompatActivity {
 
     private void gameOver(){
         System.out.println("Game Over");
-        System.exit(0);
+        Intent returnIntent = new Intent();
+        System.out.println("--------------------");
+        System.out.println(score);
+        returnIntent.putExtra("score", score);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 
     private void replacePlanes(){
