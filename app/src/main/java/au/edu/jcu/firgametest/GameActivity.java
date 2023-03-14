@@ -176,9 +176,8 @@ public class GameActivity extends AppCompatActivity {
                         if (enemy.getBlood() <= 0){
                             enemies.remove(enemy);
                             score += (100 * (1+(diffcultyNum/10)));
-                            System.out.println("------------------------");
-                            System.out.println(score);
                             timer.cancel();
+                            return;
                         } else if ( enemyX - enemyBubble <= 0){
                             wallBlood -= 100 * ((1+diffcultyNum) / 10);
                         }

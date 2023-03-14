@@ -4,11 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class LoginSQLHelper extends SQLiteOpenHelper {
+public class UserSQLHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "user.db";
     private static final int DB_VERSION = 1;
 
-    public LoginSQLHelper(Context context) {
+    public UserSQLHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 

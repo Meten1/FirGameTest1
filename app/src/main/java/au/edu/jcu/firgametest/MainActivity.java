@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private LoginSQLHelper loginSqlHelper;
+    private UserSQLHelper userSqlHelper;
     EditText name_input;
     EditText password_input;
     ImageView login_icon;
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        loginSqlHelper = new LoginSQLHelper(MainActivity.this);
+        userSqlHelper = new UserSQLHelper(MainActivity.this);
         name_input = findViewById(R.id.name_input);
         password_input = findViewById(R.id.password_input);
         login_icon = findViewById(R.id.login_icon);
@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
         String name = name_input.getText().toString();
         String password = password_input.getText().toString();
         if (!name.equals("") && !password.equals("")) {
-            SQLiteDatabase db = loginSqlHelper.getReadableDatabase();
-            String[] columns = {"name", "password"};
+            SQLiteDatabase db = userSqlHelper.getReadableDatabase();
+            String[] columns = {"name", "password","score"};
             Cursor cursor = db.query("user", columns,
                     String.format("name = '%s'", name),
                     null, null, null, null);
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(
                             MainActivity.this, GameStart.class);
                     intent.putExtra("name", name);
-                    int score = cursor.getInt(0);
+                    int score = cursor.getInt(2);
                     intent.putExtra("score", score);
                     startActivity(intent);
                 } else {
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         String username = name_input.getText().toString();
         String password = password_input.getText().toString();
         if (!username.equals("") && !password.equals("")) {
-            SQLiteDatabase db = loginSqlHelper.getWritableDatabase();
+            SQLiteDatabase db = userSqlHelper.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             contentValues.put("name", username);
             contentValues.put("password", password);

@@ -6,12 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GameStart extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
@@ -19,6 +21,8 @@ public class GameStart extends AppCompatActivity {
     private TextView introduction_text;
     private String name;
     private int score;
+
+    private UserSQLHelper userSqlHelper;
 //    AudioManager audioManager;
 
     @Override
@@ -33,6 +37,7 @@ public class GameStart extends AppCompatActivity {
         Intent intent = getIntent();
         name = intent.getStringExtra("name");
         score = intent.getIntExtra("score",0);
+        userSqlHelper = new UserSQLHelper(this);
 
 
         welcome_user();
@@ -53,11 +58,14 @@ public class GameStart extends AppCompatActivity {
                     // 处理返回的结果
                     welcome_text.setText("The game is over. Thank you very much for playing!");
                     int newScore = data.getIntExtra("score",0);
-//                    System.out.println("--------------------");
-//                    System.out.println(newScore);
                     if (newScore > score){
                         score = newScore;
                         introduction_text.setText(String.format("Up to now, your best score is: %s",score));
+                        SQLiteDatabase db = userSqlHelper.getWritableDatabase();
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put("score", score);
+
+                        System.out.println(db.update("user",contentValues,"name = ?",new String[]{name}));;
                     }
 
                 }
